@@ -1,7 +1,3 @@
-//go:build postgres
-// +build postgres
-
-// Package postgres is a database adapter for PostgreSQL.
 package postgres
 
 import (
@@ -2431,6 +2427,8 @@ func (a *adapter) FindTopics(req [][]string, opt []string, activeOnly bool) ([]t
 
 // Messages
 func (a *adapter) MessageSave(msg *t.Message) error {
+	fmt.Println("in func MessageSave")
+	fmt.Println("msg: ", msg)
 	ctx, cancel := a.getContext()
 	if cancel != nil {
 		defer cancel()

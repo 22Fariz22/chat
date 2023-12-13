@@ -2427,24 +2427,41 @@ func (a *adapter) FindTopics(req [][]string, opt []string, activeOnly bool) ([]t
 
 // Messages
 func (a *adapter) MessageSave(msg *t.Message) error {
-	fmt.Println("in func MessageSave")
-	fmt.Println("msg: ", msg)
 	ctx, cancel := a.getContext()
 	if cancel != nil {
 		defer cancel()
 	}
-	// store assignes message ID, but we don't use it. Message IDs are not used anywhere.
-	// Using a sequential ID provided by the database.
-	var id int
-	err := a.db.QueryRow(ctx,
-		`INSERT INTO messages(createdAt,updatedAt,seqid,topic,"from",head,content) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
-		msg.CreatedAt, msg.UpdatedAt, msg.SeqId, msg.Topic,
-		store.DecodeUid(t.ParseUid(msg.From)), msg.Head, toJSON(msg.Content)).Scan(&id)
-	if err == nil {
-		// Replacing ID given by store by ID given by the DB.
-		msg.SetUid(t.Uid(id))
+
+	if val, ok := msg.Head["replace"]; ok {
+		//звлекаем номер сообщения
+		seqStr := fmt.Sprintf("%v", val)
+
+		//преобразуем номер сообщения в int
+		seqInt, err := strconv.Atoi(seqStr[1:])
+		if err != nil {
+			return err
+		}
+		//
+		_, err = a.db.Exec(ctx, `UPDATE messages SET  updatedAt=$1,  head=$2, content=$3 where seqid=$4`, msg.UpdatedAt, msg.Head, toJSON(msg.Content), seqInt)
+		if err != nil {
+			return err
+		} 
+	} else {
+		// store assignes message ID, but we don't use it. Message IDs are not used anywhere.
+		// Using a sequential ID provided by the database.
+		var id int
+		err := a.db.QueryRow(ctx,
+			`INSERT INTO messages(createdAt,updatedAt,seqid,topic,"from",head,content) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
+			msg.CreatedAt, msg.UpdatedAt, msg.SeqId, msg.Topic,
+			store.DecodeUid(t.ParseUid(msg.From)), msg.Head, toJSON(msg.Content)).Scan(&id)
+		if err == nil {
+			// Replacing ID given by store by ID given by the DB.
+			msg.SetUid(t.Uid(id))
+		}
+		return err
 	}
-	return err
+
+	return nil
 }
 
 func (a *adapter) MessageGetAll(topic string, forUser t.Uid, opts *t.QueryOpt) ([]t.Message, error) {

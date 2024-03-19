@@ -1002,7 +1002,10 @@ func (t *Topic) saveAndBroadcastMessage(msg *ClientComMessage, asUid types.Uid, 
 		markedReadBySender = unreadUpdated
 	}
 
-	t.lastID++
+	if _, ok := head["replace"]; !ok {
+		t.lastID++
+	}
+
 	t.touched = msg.Timestamp
 
 	if userFound {

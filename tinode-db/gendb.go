@@ -18,6 +18,7 @@ import (
 func genDb(data *Data) {
 	var err error
 	var botAccount string
+	fmt.Println("in gendb ")
 
 	if len(data.Users) == 0 {
 		log.Println("No data provided, stopping")
@@ -402,7 +403,6 @@ func genDb(data *Data) {
 			}
 		}
 	}
-
 	log.Println("Sample data processing completed.")
 }
 

@@ -5,17 +5,25 @@
 # copied and archived.
 
 # Supported OSs: mac (darwin), windows, linux.
-goplat=( darwin darwin windows linux linux )
+# goplat=( darwin darwin windows linux linux ) 
+#для себя оставил darwin
+goplat=( darwin )
 
 # CPUs architectures: amd64 and arm64. The same order as OSs.
-goarc=( amd64 arm64 amd64 amd64 arm64 )
+# goarc=( amd64 arm64 amd64 amd64 arm64 )
+#для себя оставил amd64
+goarc=( amd64 )
+
 
 # Number of platform+architectures.
 buildCount=${#goplat[@]}
 
 # Supported database tags
-dbadapters=( mysql mongodb rethinkdb postgres )
-dbtags=( ${dbadapters[@]} alldbs )
+# dbadapters=( mysql mongodb rethinkdb postgres )
+#для себя оставил postgres
+dbadapters=( postgres )
+
+dbtags=( ${dbadapters[@]}  )
 
 for line in $@; do
   eval "$line"
@@ -145,35 +153,35 @@ done
 # Build chatbot release
 echo "Building python code..."
 
-./build-py-grpc.sh
+# ./build-py-grpc.sh
 
-# Release chatbot
-echo "Packaging chatbot.py..."
-rm -fR ./releases/tmp
-mkdir -p ./releases/tmp
+# # Release chatbot
+# echo "Packaging chatbot.py..."
+# rm -fR ./releases/tmp
+# mkdir -p ./releases/tmp
 
-cp ${GOSRC}/chat/chatbot/python/chatbot.py ./releases/tmp
-cp ${GOSRC}/chat/chatbot/python/quotes.txt ./releases/tmp
-cp ${GOSRC}/chat/chatbot/python/requirements.txt ./releases/tmp
+# cp ${GOSRC}/chat/chatbot/python/chatbot.py ./releases/tmp
+# cp ${GOSRC}/chat/chatbot/python/quotes.txt ./releases/tmp
+# cp ${GOSRC}/chat/chatbot/python/requirements.txt ./releases/tmp
 
-tar -C ${GOSRC}/chat/releases/tmp -zcf ./releases/${version}/py-chatbot.tar.gz .
-pushd ./releases/tmp > /dev/null
-zip -q -r ../${version}/py-chatbot.zip ./*
-popd > /dev/null
+# tar -C ${GOSRC}/chat/releases/tmp -zcf ./releases/${version}/py-chatbot.tar.gz .
+# pushd ./releases/tmp > /dev/null
+# zip -q -r ../${version}/py-chatbot.zip ./*
+# popd > /dev/null
 
-# Release tn-cli
-echo "Packaging tn-cli..."
+# # Release tn-cli
+# echo "Packaging tn-cli..."
 
-rm -fR ./releases/tmp
-mkdir -p ./releases/tmp
+# rm -fR ./releases/tmp
+# mkdir -p ./releases/tmp
 
-cp ${GOSRC}/chat/tn-cli/*.py ./releases/tmp
-cp ${GOSRC}/chat/tn-cli/*.txt ./releases/tmp
+# cp ${GOSRC}/chat/tn-cli/*.py ./releases/tmp
+# cp ${GOSRC}/chat/tn-cli/*.txt ./releases/tmp
 
-tar -C ${GOSRC}/chat/releases/tmp -zcf ./releases/${version}/tn-cli.tar.gz .
-pushd ./releases/tmp > /dev/null
-zip -q -r ../${version}/tn-cli.zip ./*
-popd > /dev/null
+# tar -C ${GOSRC}/chat/releases/tmp -zcf ./releases/${version}/tn-cli.tar.gz .
+# pushd ./releases/tmp > /dev/null
+# zip -q -r ../${version}/tn-cli.zip ./*
+# popd > /dev/null
 
 # Clean up temporary files
 rm -fR ./releases/tmp
